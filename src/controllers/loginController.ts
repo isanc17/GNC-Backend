@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { sendResponse } from "../utils/response";
 import { connectToDatabase } from "../db/database";
-import { User } from "../models/user";
+import { User, UserAttr } from "../models/user";
 import { generateToken } from "../utils/jwt";
+import { findUserByEmail } from "./usersController";
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -19,12 +20,18 @@ export const login = async (req: Request, res: Response) => {
   try {
     const db = await connectToDatabase();
 
-    const userData = await db.get(
-      `SELECT id, name, email, password FROM users WHERE email = ?`,
-      [email]
-    );
+    const userData: UserAttr | undefined = await findUserByEmail(email as string);
 
     await db.close();
+
+    if (!userData) {
+      console.log("Usuario no encontrado");
+      return sendResponse(res, 401, "error", "Credenciales inválidas");
+    }
+
+    if(userData.status == 0) {
+      return sendResponse(res, 401, "error", "Usuario inactivo, comuniquese con el administrador");
+    }
 
     const user = new User();
     user.id = userData.id;
@@ -34,8 +41,8 @@ export const login = async (req: Request, res: Response) => {
 
     const passwordMatch = await user.validPassword(password as string);
 
-    if (!userData || !passwordMatch) {
-      console.log("Usuario no encontrado o sin contraseña");
+    if (!passwordMatch) {
+      console.log("Contraseña inválida");
       return sendResponse(res, 401, "error", "Credenciales inválidas");
     }
 
