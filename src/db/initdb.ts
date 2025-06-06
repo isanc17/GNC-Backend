@@ -26,7 +26,7 @@ async function createTables(db: any): Promise<void> {
         email TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
         department_id INTEGER NOT NULL,
-        status BOOLEAN NOT NULL DEFAULT 0,
+        status BOOLEAN NOT NULL DEFAULT 1,
         createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (department_id) REFERENCES department(id)
       );
