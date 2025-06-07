@@ -6,7 +6,16 @@ ________________________________________________________________________________
 Node.js (versión 14 o superior)
 npm (viene con Node.js)
 Si no tienes Node.js instalado, puedes descargarlo desde https://nodejs.org.
-_____________________________________________________________________
+______________________________________________________________________________________________________
+## Definir variables de entorno
+ **Crea un archivo `.env`** Para la configuración de los tokens (tal como en el .env.example); si usas la bd versionada las secrete key deben ser estas:
+
+   ```bash
+    JWT_SECRET=supersecreto123
+    JWT_EXPIRES_IN=3600
+   ```
+______________________________________________________________________________________________________
+
 
 ## Instala las Dependencias
 
@@ -16,13 +25,32 @@ npm install
 ______________________________________________________________________________________________________
 
 ## Estructura del Proyecto
-/db
-  └── tareas.db (se crea automáticamente)
+database.db (se crea automáticamente)
 src/
-  ├── app.ts            (Archivo principal del servidor)
-  ├── database.ts       (Conexión a la base de datos SQLite)
-  ├── seed.ts           (Datos iniciales para la base de datos)
-  └── initDb.ts         (Inicialización de la base de datos)
+├── app.ts          (Archivo principal del servidor)
+├── /db
+├    ├── database.ts            (Conexión a la base de datos SQLite)
+├    ├── seed.ts                (Datos iniciales para la base de datos)
+├    ├── seed_roles.ts          (Datos iniciales para la base de datos)
+├    ├── seed_options.ts        (Datos iniciales para la base de datos)
+├    ├── seed_category.ts       (Datos iniciales para la base de datos)
+├    └── initDb.ts              (Inicialización de la base de datos)
+├── /middleware
+├    ├── loginMiddleware.ts     (Busca y verifica los JWT)
+├    ├── loginValidator.ts      (Valida los datos del request para login)
+├    └── validationHandler.ts   (Revisa resultados de validators y retorna respuesta con base en ellos)
+├── /models
+├    ├── models.ts              (DTOs de la app)
+├    └── user.ts                (Clase usuario)
+├── /routes
+├    ├── loginRoutes.ts         (Gestor de rutas para el modulo: Login)
+├    ├── optiomsRoutes.ts       (Gestor de rutas para el modulo: Options)
+├    └── userRoutes.ts          (Gestor de rutas para el modulo: User)
+├── /utils
+├    ├── const.ts               (Constantes del la app, generalmente querys)
+├    ├── inserts.sql            (Inserts para cargar la bd)
+├    ├── jwt.ts                 (Funciones para JWT)
+├    └── response.ts            (Gestor de respuestas del api)
 package.json
 tsconfig.json
 jest.config.js
@@ -39,7 +67,7 @@ Este comando hará lo siguiente:
 
 Verificar si la carpeta db existe. Si no, se creará automáticamente.
 Crear la base de datos tareas.db si no existe.
-Crear las tablas usuario y tareas dentro de la base de datos.
+Crear las tablas dentro de la base de datos.
 Insertar datos de ejemplo en las tablas.
 
 ## Ejecución del Servidor
@@ -50,16 +78,15 @@ ________________________________________________________________________________
 ## Rutas Disponibles
 
 login
-    GET /login                Obtener token de sesión
+    POST /login                 Obtener token de sesión
 
 Usuarios
-    GET /usuarios/activos     Obtener todos los usuarios.
-    POST /usuarios            Crear un nuevo usuario.
-Tareas
-    GET /tasks                Obtener todas las tareas.
-    POST /tasks               Crear una nueva tarea.
-    PUT /tasks/:id            Actualizar una tarea existente.
-    DELETE /tasks/:id         Eliminar una tarea.
+    GET /users/:status          Obtener todos los usuarios por status.
+    GET /users                  Obtener todos los usuarios.
+    POST /users                 Crear un nuevo usuario.
+Opciones
+    GET /options/all            Opciones disponibles desde el portal
+    GET /options/byUser         Opciones de cada usuario para el menu
 ______________________________________________________________________________________________________
 
 ## Pruebas
